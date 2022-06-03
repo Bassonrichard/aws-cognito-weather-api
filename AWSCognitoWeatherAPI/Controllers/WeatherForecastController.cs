@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 
 namespace AWSCognitoWeatherAPI.Controllers
 {
@@ -19,7 +20,7 @@ namespace AWSCognitoWeatherAPI.Controllers
             _logger = logger;
         }
 
-        [Authorize]
+        [Authorize(Policy = "ReadScopePolicy")]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {

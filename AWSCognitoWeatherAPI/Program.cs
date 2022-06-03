@@ -1,4 +1,6 @@
+using AWSCognitoWeatherAPI.Authorization.Scopes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,23 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCognitoIdentity();
+
+string scopeIssuer = builder.Configuration["AWSCognito:ScopeIssuer"];
+
+builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ReadScopePolicy", policy =>
+    {
+        policy.AddRequirements(new HasScopeRequirement($"{scopeIssuer}/read"));
+    });
+
+    options.AddPolicy("ReadWriteScopePolicy", policy =>
+    {
+        policy.AddRequirements(new HasScopeRequirement($"{scopeIssuer}/read"), new HasScopeRequirement($"{scopeIssuer}/write"));
+    });
+});
 
 builder.Services.AddAuthentication(options =>
 {
